@@ -81,7 +81,7 @@ class Cons extends Thread {
 	}
 }
 
-public class JavaT extends Thread {
+public class ProdutorConsumidor extends Thread {
 	public static void main(String[] args) {
 		ReentrantLock lock = new ReentrantLock();
 		Drop drop = new Drop(lock);
