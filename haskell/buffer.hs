@@ -4,12 +4,11 @@ import Control.Concurrent
 main :: IO ()
 main = do
     
-    lista <- atomically (newTVar [])
+    lista <- newTVarIO []
     put lista 10
     a <- get lista
     putStrLn $ show a
     return ()
-    -- putStrLn $ (readTVar memoria)
 
 get :: TVar [Integer] -> IO Integer
 get mem = do atomically(do (x:xs) <- readTVar mem
