@@ -6,10 +6,12 @@ main = do
     lista <- atomically (newBuffer)
     fim <- atomically (newTVar 2)
     forkIO (incrementador lista 1000 fim)
-    forkIO (decrementador lista 1000 fim)
+    forkIO (decrementador lista 500 fim)
     forkIO (waitThreads fim)
     f <- atomically (readTVar fim)
+    a <- atomically (readTVar lista)
     print f
+    print $ show a
     return ()
 
     
