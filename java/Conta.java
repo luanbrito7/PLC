@@ -1,19 +1,22 @@
+import java.util.concurrent.atomic.AtomicReference;
+
+
 public class Conta extends Thread {
-	double saldo;
+	AtomicReference <Double> saldo = new AtomicReference<Double>();
 	
 	
-	Conta (double saldo) {
-		this.saldo = saldo;
+	Conta (double valor) {
+		this.saldo.set(valor);
 	}
 	
 	synchronized public void deposit(double valor){
-		this.saldo += valor;
-		System.out.println("Colocando o valor: " + valor + " ficando com: " + this.saldo);
+		this.saldo.set(this.saldo.get() + valor);
+		System.out.println("Colocando o valor: " + valor + " ficando com: " + this.saldo.get());
 		notify();
 	}
 	
 	synchronized public void retirar(int valor){
-		while (this.saldo < valor) {
+		while (this.saldo.get() < valor) {
 			try {
 				wait();
 			} catch (InterruptedException e) {
@@ -21,7 +24,7 @@ public class Conta extends Thread {
 				e.printStackTrace();
 			}
 		}
-		this.saldo -= valor;
+		this.saldo.set(this.saldo.get() - valor);
 		System.out.println("Retirando o valor: " + valor + " ficando com: " + this.saldo);
 	}
 	
