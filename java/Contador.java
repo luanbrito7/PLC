@@ -1,56 +1,75 @@
-class Counter extends Thread {
-	int counter;
-	long max;
+public class Contador extends Thread {
+	int contador;
 	
-	Counter(int min, int max) {
-		this.max = max;
-		this.counter = min; //De onde começo a contar
+	
+	Contador () {
+		this.contador = 0;
 	}
 	
 	synchronized public void increment() {
-		if (this.counter < this.max) {
-			this.counter ++;
-			System.out.println("Adicionei para: " + this.counter);
-		}
-			
+		this.contador += 1;
 	}
+	
+	synchronized public void decrement(){
+		this.contador -= 1;
+	}
+	
+	public static void main(String []args) {
+		Contador contador = new Contador();
+		Thread[] threads = new Thread[4];
+		
+		for (int i = 0; i < 4; i++) {
+			if (i % 2 == 0) {
+				threads[i] = new Produtor(contador);
+				System.out.println("Criei um produtor.");
+			} else {
+				threads[i] = new Consumidor(contador);
+				System.out.println("Criei um consumidor.");
+			}
+		}
+		
+		for (int i = 0; i < 4; i++) {
+			threads[i].start();
+		}
+		
+		for (int i = 0; i < 4; i++) {
+			try {
+				threads[i].join();
+				System.out.println("Thread " + i + " morreu.");
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Valor final do contador: " + contador.contador);
+	}
+	
 }
 
-/**
- * Não é eficiente porque as threads não podem trabalhar realmente em paralelo
- **/
-
-public class JavaT extends Thread {
-	Counter contador;
-	int index;
+class Produtor extends Thread {
+	Contador contador;
 	
-	JavaT(Counter contador, int index) {
+	Produtor(Contador contador) {
 		this.contador = contador;
-		this.index = index;
 	}
 	
 	public void run() {
-		while(this.contador.counter < this.contador.max){ //Cada thread vai tentar incrementar até os fins dos tempos
-			System.out.println("Thread de Index(" + this.index + ") || contador em (" + this.contador.counter + ") " );
+		for (int i = 0; i < 1000; i++) {
 			this.contador.increment();
 		}
 	}
+}
+
+class Consumidor extends Thread {
+	Contador contador;
 	
-	public static void main(String[] args) {
-		Counter c = new Counter(0, 10000);
-		JavaT[] threads = new JavaT[10];
-		for (int i = 0; i < 10; i++) { //Vamos criar 10 threads para contar
-			threads[i] = new JavaT(c, i);
-		}
-		for (int i = 0; i < 10; i++) {
-			threads[i].start();
-		}
-		try {
-			for (int i = 0; i < 10; i++) {
-				threads[i].join();
-			}
-		} catch(InterruptedException ie) {
-			System.out.println(ie);
+	Consumidor(Contador contador) {
+		this.contador = contador;
+	}
+	
+	public void run() {
+		for (int i = 0; i < 1000; i++) {
+			this.contador.decrement();
 		}
 	}
 }
